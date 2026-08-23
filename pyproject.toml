@@ -1,0 +1,8 @@
+[project]
+name = "sora-ai-os"
+version = "0.1.0"
+description = "A lightweight, Git-backed personal knowledge OS for Codex"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
