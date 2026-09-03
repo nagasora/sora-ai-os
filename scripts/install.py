@@ -10,6 +10,7 @@ from pathlib import Path
 
 BEGIN = "<!-- SORA-AIOS:BEGIN -->"
 END = "<!-- SORA-AIOS:END -->"
+ADDITIONAL_CONTEXT_LIMIT = 4000
 
 
 class Installer:
@@ -87,7 +88,7 @@ class Installer:
                     {
                         "type": "command",
                         "command": start_cmd,
-                        "additionalContextLimit": 500,
+                        "additionalContextLimit": ADDITIONAL_CONTEXT_LIMIT,
                         "statusMessage": "Loading AI Knowledge OS route",
                     }
                 ],
