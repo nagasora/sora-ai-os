@@ -55,3 +55,4 @@ For feature work, bug fixes, and code-changing maintenance, use the `implementat
 - A reviewer checks the scoped diff and existing evidence first; it adds a test or broader suite only when a concrete risk or failing behavior justifies it.
 
 Detailed workflow: `.agents/skills/implementation-harness/SKILL.md`.
+- For HTML/CSS/Tailwind/React UI work, load `.agents/skills/ui-design-harness/SKILL.md`; select one domain and lock its typography/tokens across the product instead of reusing a generic full-screen template.
