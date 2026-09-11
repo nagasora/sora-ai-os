@@ -1,5 +1,14 @@
 # Personal Codex operating rules
 
+## Cost-efficient agent tree
+
+- Root/orchestrator: `gpt-6-astra`, reasoning `medium`. Own scope, acceptance criteria, integration, verification, and the final response.
+- Delegate on demand: `explorer` = `gpt-5.6-luna` / `max` for bounded repository investigation; `worker` = `gpt-5.6-sol` / `high` for implementation and focused tests; `researcher` = `gpt-5.6-luna` / `max` for focused source lookup.
+- Only when needed: `reviewer` = `gpt-6-astra` / `xhigh` for independent review after integration, when a concrete correctness/security/concurrency risk or explicit user request justifies it. Self-review is not independent review.
+- Split useful work; do not spawn every role. Handle small tasks locally. Delegate only a concrete bounded subtask that can run alongside useful parent work. Keep at most three children active; children must not delegate further.
+- Each handoff specifies objective, owned files/read-only scope, acceptance criteria, and required evidence. Never overlap writers or repeat the same investigation. Pass distilled context, not the entire history; when using explicit model overrides, use a fresh or limited-history fork.
+- Return findings or changed files, validation evidence, and unresolved risks. Root integrates and verifies proportionately. If a requested model is unavailable, report that limitation rather than silently substituting it.
+
 ## Goal
 Improve future work by reusing verified knowledge before repeating research, while keeping always-loaded context small.
 
@@ -22,7 +31,7 @@ Improve future work by reusing verified knowledge before repeating research, whi
 - Search narrow before reading broad.
 - Read summaries before source detail.
 - External GitHub/web research should be bounded: shortlist first, deep-read only top candidates.
-- Do not spawn subagents for small tasks; each subagent has separate model/tool cost.
+- Use the agent tree only when division of work is useful; every child consumes additional model/tool budget.
 - Prefer deterministic scripts for indexing, filtering, validation, and repetitive transforms.
 - Keep final task context focused on requirements, decisions, and results; avoid raw logs unless needed.
 
@@ -51,8 +60,8 @@ For feature work, bug fixes, and code-changing maintenance, use the `implementat
 - Test budget: start with one reusable test unit per feature (prefer extending or parameterizing an existing test file). Add a new test file only when the behavior has no natural existing home or is an independent boundary. Add tests for new observable behavior, regressions, or material risk—not for every edit or internal branch.
 - After the focused test passes, stop. Run broader suites only when the change crosses module/API/schema/concurrency/security/build boundaries, CI requires them, or the user asks. Do not create another test merely to reduce uncertainty.
 - For a GitHub-backed change, completion requires a clean scoped diff, the proportionate validation, and an opened pull request with its URL, summary, validation, and known limitations. Never stage unrelated work, merge the PR, or claim completion without the PR; if remote access or permission blocks it, report `BLOCKED` with the exact missing gate.
-- Sol/coordinator chooses the risk tier and acceptance condition, then authorizes one implementation pass and at most one focused review/repair loop. Do not parallelize overlapping edits or ask for duplicate validation by default.
-- A reviewer checks the scoped diff and existing evidence first; it adds a test or broader suite only when a concrete risk or failing behavior justifies it.
+- Astra root chooses the risk tier and acceptance condition, delegates bounded implementation to Sol when useful, and integrates and verifies the result.
+- During self-review, add a test or broader suite only when a concrete risk or failing behavior justifies it.
 
 Detailed workflow: `.agents/skills/implementation-harness/SKILL.md`.
 - For HTML/CSS/Tailwind/React UI work, load `.agents/skills/ui-design-harness/SKILL.md`; select one domain and lock its typography/tokens across the product instead of reusing a generic full-screen template.

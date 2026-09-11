@@ -1,5 +1,9 @@
 # AI Knowledge OS repository guidance
 
+## Agent policy
+
+Use the cost-efficient agent tree in `global/AGENTS.md`. Delegate bounded work on demand; do not spawn every role or allow recursive delegation.
+
 Read `global/AGENTS.md` as the canonical personal operating policy for this repository.
 
 ## Repository rules
