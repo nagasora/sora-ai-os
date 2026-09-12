@@ -25,6 +25,16 @@ description: Use for feature implementation, bug fixes, and code-changing mainte
 - 将来の拡張だけを理由に抽象化しない。フォールバック、リトライ、広い例外捕捉、互換層、機能無効化で本線の不具合を隠さない。
 - 既存の未コミット変更を上書き・混入させない。差分を確認し、自分のファイルだけを扱う。
 
+## File locator policy
+
+Treat "unique" as two separate concerns: finding a file and verifying that the found file is the intended one.
+
+- Do not use a hash, UUID, timestamp, random string, session ID, or agent ID hardcoded as a locator for source, test, config, document, or reusable generated files.
+- Prefer stable semantic relative paths, file names, project configuration, manifests, or human-readable identifiers, and use repository search to resolve the current location.
+- Use hashes only to verify integrity, provenance, cache identity, or deduplication after the file has been resolved. For hash-named external or generated artifacts, resolve through current metadata before checking the hash.
+
+Agents reach for hashes because they are deterministic, collision-resistant, and readily available in tool output. That helps with verification and artifact deduplication, but hashes are opaque, brittle across runs and worktrees, and hard for people to reuse as file locations.
+
 ## Test budget
 
 「1機能1テスト単位」をデフォルトにする。ここでいう単位は、既存テストファイル内の1つの再利用可能なテスト関数・パラメータ化ケース、または機能に対応する1つのテストファイルのいずれかである。
