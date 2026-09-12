@@ -51,6 +51,13 @@ Do not save trivial edits, transient paths, secrets, raw logs, or guesses.
 - Commit messages explain Why the change exists.
 - Code comments are reserved for Why not: rejected alternatives, non-obvious constraints, or hazards.
 
+## Stable file discovery
+
+- Never use a content hash, UUID, timestamp, random string, session ID, or agent ID as a hardcoded locator for a source, test, config, document, or other reusable file.
+- Locate files with stable semantic paths or names, project configuration, manifests, or human-readable identifiers; use repository search to discover the current path.
+- Separate locating from verifying: a semantic path or manifest locates the file, while a hash may verify integrity, provenance, cache identity, or deduplication after resolution.
+- If an external or generated artifact is hash-named, resolve it through current metadata and validate the hash afterward. Never copy the hash into reusable instructions, source code, tests, or PR text as the locator.
+
 ## Implementation harness
 
 For feature work, bug fixes, and code-changing maintenance, use the `implementation-harness` skill when available. The default operating contract is:
