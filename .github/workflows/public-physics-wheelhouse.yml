@@ -1,0 +1,70 @@
+name: Public physics wheelhouse
+
+on:
+  push:
+    branches: [infra/public-physics-wheelhouse-20260916]
+    paths: [.github/workflows/public-physics-wheelhouse.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-physics-wheelhouse
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.5'
+      - name: Build only pinned public dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p wheelhouse
+          python -m pip install 'setuptools==82.0.1' 'wheel==0.45.1' 'numpy==2.3.5'
+          curl --fail --location --retry 2 --output pybullet-3.2.7.tar.gz 'https://files.pythonhosted.org/packages/de/95/b9a98cd4ed948d4f25a7d0b13cb0c1f87e58dc6d113be9e18940641eb25f/pybullet-3.2.7.tar.gz'
+          echo '042879db8d101ac7590dee475fc6aded508b85fe1273fdbbfde1d88bd200e14f  pybullet-3.2.7.tar.gz' | sha256sum -c -
+          python -m pip wheel --no-deps --no-build-isolation --wheel-dir wheelhouse ./pybullet-3.2.7.tar.gz
+          python -m pip download --only-binary=:all: --dest wheelhouse 'gymnasium==1.2.3'
+          python -m pip install --no-index --find-links wheelhouse 'pybullet==3.2.7' 'gymnasium==1.2.3'
+      - name: Verify direct-mode import and archive provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, importlib.metadata as md, json, pathlib, platform, sys
+          import pybullet as p
+          import pybullet_data
+          import gymnasium
+          c = p.connect(p.DIRECT)
+          assert c >= 0
+          p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=c)
+          p.loadURDF('plane.urdf', physicsClientId=c)
+          p.stepSimulation(physicsClientId=c)
+          p.disconnect(c)
+          root = pathlib.Path('wheelhouse')
+          manifest = {'python': sys.version, 'platform': platform.platform(),
+                      'packages': {n: md.version(n) for n in ('pybullet','gymnasium','numpy')},
+                      'source_sha256': '042879db8d101ac7590dee475fc6aded508b85fe1273fdbbfde1d88bd200e14f',
+                      'direct_smoke_passed': True,
+                      'wheels': {f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in root.glob('*.whl')}}
+          (root / 'provenance.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          print(json.dumps(manifest, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: public-physics-cp313-linux-x86_64
+          path: wheelhouse/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
