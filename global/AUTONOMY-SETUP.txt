@@ -11,6 +11,8 @@
   python3 scripts/install_autonomy.py --home /tmp/autonomy-demo --apply
 
 既存の独自指示を保持し、SORA-AUTONOMYブロックだけ更新します。
+ログには対象パスと変更件数だけを表示し、既存設定の本文は表示しません。
+設定ファイルはUTF-8で読み書きします。
 変更前のファイルは各設定と同じディレクトリに .pre-autonomy-backup 接尾辞で退避します。
 復旧時はバックアップと現状を比較し、今回追加したブロックを除去するか、後続変更がなければバックアップを戻してください。
 Codex/Claude Codeの新しいセッションで指示の読み込みを確認してください。

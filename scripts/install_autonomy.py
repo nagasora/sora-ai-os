@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import difflib
 import shutil
 from pathlib import Path
 
@@ -25,11 +24,11 @@ def merge(current: str, policy: str) -> str:
 
 
 def install(home: Path, apply: bool) -> int:
-    policy = (ROOT / 'global/AUTONOMOUS.md').read_text()
+    policy = (ROOT / 'global/AUTONOMOUS.md').read_text(encoding="utf-8")
     plan = []
     for relative in ('.codex/AGENTS.md', '.claude/CLAUDE.md'):
         target = home / relative
-        current = target.read_text() if target.exists() else ''
+        current = target.read_text(encoding="utf-8") if target.exists() else ''
         updated = merge(current, policy)
         plan.append((target, current, updated))
     changed = 0
@@ -37,7 +36,7 @@ def install(home: Path, apply: bool) -> int:
         if current == updated:
             continue
         changed += 1
-        print(''.join(difflib.unified_diff(current.splitlines(True), updated.splitlines(True), fromfile=str(target), tofile=str(target))), end='')
+        print(f'{"WRITE" if apply else "PLAN"}: {target}')
         if apply:
             if target.exists():
                 backup = target.with_name(target.name + '.pre-autonomy-backup')
@@ -48,8 +47,8 @@ def install(home: Path, apply: bool) -> int:
                 shutil.copy2(target, backup)
                 print(f'Backup: {backup}')
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(updated)
-            if target.read_text() != updated:
+            target.write_text(updated, encoding="utf-8")
+            if target.read_text(encoding="utf-8") != updated:
                 raise OSError(f'Verification failed: {target}')
     print(f'{"Applied" if apply else "Preview"}: {changed} changed files')
     return changed
