@@ -1,0 +1,28 @@
+自律実行設定
+
+適用先: ~/.codex/AGENTS.md と ~/.claude/CLAUDE.md
+共通原本: global/AUTONOMOUS.md
+
+確認:
+  python3 scripts/install_autonomy.py
+適用:
+  python3 scripts/install_autonomy.py --apply
+別ホームへ検証:
+  python3 scripts/install_autonomy.py --home /tmp/autonomy-demo --apply
+
+既存の独自指示を保持し、SORA-AUTONOMYブロックだけ更新します。
+ログには対象パスと変更件数だけを表示し、既存設定の本文は表示しません。
+設定ファイルはUTF-8で読み書きします。
+変更前のファイルは各設定と同じディレクトリに .pre-autonomy-backup 接尾辞で退避します。
+復旧時はバックアップと現状を比較し、今回追加したブロックを除去するか、後続変更がなければバックアップを戻してください。
+Codex/Claude Codeの新しいセッションで指示の読み込みを確認してください。
+
+ChatGPT: global/CHATGPT-INSTRUCTIONS.txt を Custom Instructions または対象 Project の指示に貼り付けてください。
+このインストーラーはChatGPTのアカウント設定を変更しません。
+
+これは実行方針の設定です。常駐デーモン、スケジューラー、外部サービスの認証、追加のAPI利用料金は構成しません。
+プロンプト単体では権限・ツール・実行時間の制限を超えた全自動実行はできません。
+
+参照:
+https://learn.chatgpt.com/docs/agent-configuration/agents-md
+https://code.claude.com/docs/en/memory
